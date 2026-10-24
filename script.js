@@ -233,5 +233,29 @@ if (topButton) topButton.addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 function loadShareSDK(){if(!cfg.kakaoJavascriptKey)return;const s=document.createElement('script');s.src='https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js';s.crossOrigin='anonymous';s.onload=()=>{if(window.Kakao&&!Kakao.isInitialized())Kakao.init(cfg.kakaoJavascriptKey)};document.head.append(s)}loadShareSDK();
-$('#shareKakao').addEventListener('click',async()=>{const url=cfg.publicUrl||location.href;if(window.Kakao?.isInitialized()){try{Kakao.Share.sendDefault({objectType:'feed',content:{title:'수한 ♥ 서령의 결혼식에 초대합니다.',description:'2026년 12월 19일 오후 4시 · 천주교 논현2동 성당',imageUrl:new URL('assets/main.jpg',url).href,link:{mobileWebUrl:url,webUrl:url}},buttons:[{title:'청첩장 보기',link:{mobileWebUrl:url,webUrl:url}}]});return;}catch(err){console.warn(err);}}if(navigator.share){try{await navigator.share({title:'수한 ♥ 서령의 결혼식',text:'2026년 12월 19일 오후 4시 · 천주교 논현2동 성당',url});return;}catch{}}notify('카카오 공유 설정이 필요합니다.');});
+$('#shareKakao').addEventListener('click',()=>{
+  const url = cfg.publicUrl || 'https://wedding-seoryungsuhan-v2.vercel.app/';
+  if (!window.Kakao || !Kakao.isInitialized() || !Kakao.Share?.sendDefault) {
+    notify('카카오톡 공유 기능을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+    return;
+  }
+  try {
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '수한 ♥ 서령, 결혼합니다',
+        description: '2026.12.19 토요일 오후 4시 · 천주교 논현2동 성당',
+        imageUrl: new URL('assets/main.jpg', url).href,
+        link: { mobileWebUrl: url, webUrl: url }
+      },
+      buttons: [{
+        title: '청첩장 보러가기',
+        link: { mobileWebUrl: url, webUrl: url }
+      }]
+    });
+  } catch (err) {
+    console.error('카카오톡 공유 오류:', err);
+    notify('카카오톡 공유에 실패했습니다. 카카오 앱 설정과 도메인을 확인해주세요.');
+  }
+});
 })();

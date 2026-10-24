@@ -3,7 +3,7 @@ window.WEDDING_CONFIG = {
   kakaoJavascriptKey: 'd312c3ebae68d3fc9c7251bbd032c300', // 카카오 개발자 콘솔 JavaScript 키
   rsvpScriptUrl: 'https://script.google.com/macros/s/AKfycbzuyGeQeAgQHrnLhz5kZneE5Qg_gC0HvT3mfrLrmb-NsEXTXYWhy5-6OBLLORd4Wy8Z/exec',      // RSVP용 Apps Script 웹앱 /exec URL
   guestbookScriptUrl: '', // 선택: 방명록용 Apps Script 웹앱 /exec URL
-  publicUrl: 'https://wedding-seoryungsuhan.vercel.app/',
+  publicUrl: 'https://wedding-seoryungsuhan-v2.vercel.app/',
   // 실제 에셋을 assets/gallery-01.jpg ... 순서대로 넣으세요.
   galleryCount: 9,
 };
