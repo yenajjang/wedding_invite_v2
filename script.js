@@ -70,7 +70,7 @@ window.addEventListener('scroll',()=>{if(window.scrollY>4)startMusicOnScroll();}
 const today=new Date(); today.setHours(0,0,0,0);const diff=Math.ceil((weddingDate.getTime()-today.getTime())/86400000);
 $('#dDayNumber').textContent=diff>0?`D-${diff}`:diff===0?'D-DAY':`D+${Math.abs(diff)}`;
 $('#dDayText').textContent=diff>0?`수한 ♥ 서령의 결혼식이 ${diff}일 남았습니다.`:diff===0?'오늘은 수한 ♥ 서령의 결혼식입니다.':'수한 ♥ 서령의 결혼식에 참석해주셔서 감사합니다.';
-setTimeout(()=>{modal('dDayModal',true);startDdayFireworks();},450);
+setTimeout(()=>{modal('dDayModal',true);if(diff===0)startDdayFireworks();},450);
 
 // Lightweight D-DAY-only firework animation; no external libraries.
 function startDdayFireworks(){
