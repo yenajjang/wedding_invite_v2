@@ -1,0 +1,452 @@
+@font-face{font-family:"Ortica";src:url("./assets/OrticaLinear-Light.otf") format("opentype");font-weight:400;font-style:normal;font-display:swap;}:root{--orange:#FF650B;--black:#111111;--fg:#c7c1be;--muted:#908986;--copper:#ab7e6d;--line:#353332;--font:'Pretendard',sans-serif;--display:'Italiana','Playfair Display',serif}@font-face{font-family:'BodoniCustom';src:url('./assets/Bodoni-11-Book.otf?v=12') format('opentype');font-weight:100;font-style:normal;font-display:swap;}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#e9e9e9;color:var(--fg);font-family:var(--font);-webkit-font-smoothing:antialiased}button,input,textarea{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--orange);outline-offset:3px}a{color:inherit;text-decoration:none}.page{width:min(100%,430px);margin:auto;background:var(--black);min-height:100vh;overflow:hidden;position:relative}.site-header{position:fixed;z-index:20;top:0;left:50%;transform:translateX(-50%);width:min(100%,430px);height:52px;background:var(--orange);color:#f7e7dd;display:flex;align-items:center;justify-content:flex-end;padding:0 23px;font-family:'Playfair Display',serif;font-size:22px;transition:background .25s,color .25s}.site-header.over-photo{background:transparent;color:#fff}.icon-button{border:0;background:none;color:inherit;padding:2px}.icon-button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.6}.menu{position:fixed;z-index:19;top:52px;left:50%;transform:translateX(-50%) translateY(-110%);width:min(100%,430px);background:#1c1b1b;color:#eee;padding:18px 30px;display:grid;gap:20px;transition:transform .3s}.menu.open{transform:translateX(-50%) translateY(0)}.menu a{font-family:var(--display);font-size:24px}.audio-toggle{position:fixed;z-index:22;top:14px;right:max(12px,calc((100vw - 430px)/2 + 14px));background:rgba(20,20,20,.18);border:0;border-radius:50%;width:37px;height:37px;display:grid;place-items:center;color:#fafafa}.audio-toggle svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.5}.cover{background:var(--orange);min-height:100svh;display:flex;flex-direction:column;text-align:center;color:#130b06}.cover-top{padding-top:52px;background:var(--orange)}.cover-inner{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:18px 18px 18px;background:var(--orange)}.cover-photo{width:100%;margin:0;padding:0 0 20px;background:var(--orange);overflow:hidden}.cover-photo img{display:block;width:100%;height:auto;max-width:none;max-height:none;object-fit:unset;filter:grayscale(1);transform:none;clip-path:inset(70px 0 0 0)}.cover-meta{background:var(--orange);margin-top:-6px;padding:8px 18px 20px;text-align:center}.cover-datetime{margin:0 0 8px;display:flex;align-items:baseline;justify-content:center;gap:8px;flex-wrap:wrap}.cover-date{font-family:'Pretendard',sans-serif;font-size:30px;font-weight:500;letter-spacing:.015em;line-height:1;color:#8F421E}.cover-when{font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;font-size:15px;letter-spacing:.04em;color:#8F421E}.cover-where{font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;font-size:15px;letter-spacing:.04em;color:#8F421E;margin:0}.intro-meta{font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;font-size:15px;letter-spacing:.04em;color:#8F421E}.cover-kicker{font-size:12px;color:#8F421E !important;margin:0 0 22px;letter-spacing:.15em;font-weight:400;transform:translateY(-8px)}.couple{display:flex;flex-direction:column;align-items:center;font-family:'BodoniCustom','Bodoni 72','Times New Roman',serif;font-size:24px;letter-spacing:-.015em;font-weight:400;line-height:1.08;margin:0;color:#121212;white-space:nowrap;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.couple span{display:block;font-family:'BodoniCustom','Bodoni 72','Times New Roman',serif;font-weight:400}.couple em{font-family:'BodoniCustom','Bodoni 72','Times New Roman',serif;font-style:normal;font-size:17px;line-height:1.9;color:rgba(78,40,16,.72);font-weight:200}.cover-date{font-family:'Pretendard',sans-serif;font-size:30px;font-weight:500;letter-spacing:.015em;line-height:1;margin:0 0 8px;color:#8F421E}.cover-when,.cover-where{font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;font-size:15px;letter-spacing:.04em;color:#8F421E}.cover-when{margin:0 0 8px}.cover-where{margin:0}.dark-content{background:var(--black)}.section{padding:110px 22px;text-align:center;scroll-margin-top:50px}.display{font-family:var(--display);font-weight:400;letter-spacing:-.04em}.intro{min-height:511px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:84px}.display-intro{font-family:"Ortica","Noto Sans KR",sans-serif;font-size:1.875rem;font-weight:400;line-height:1.375;letter-spacing:-.04em;color:#D4CFC8;text-align:center;white-space:pre-line;opacity:1;margin:0;-webkit-font-smoothing:antialiased}.display-intro i{font-style:normal}.family{margin-top:118px;font-size:15px;line-height:2.7}.family p{margin:0}.family strong{color:#e0dcda;font-weight:600}.family small{font-size:11px;color:#878080;margin:0 8px}.eyebrow{font:400 11px 'DM Sans',sans-serif;letter-spacing:.22em;color:var(--copper);margin:0}.invitation-note{padding-top:51px;padding-bottom:105px}.poem{margin-top:52px;text-align:left;padding:0 15px;color:#bbb5b2;font-size:16px;line-height:2.05}.poem p{margin:0}.poem span{font-size:12px;display:block;margin-top:2px;color:#8c8581}.invite-copy{text-align:center;padding:0 15px;margin-top:52px;font-size:15px;line-height:2.15;color:#aea8a5}.invite-copy p+p{margin-top:25px}.calendar-section{padding-top:76px;padding-bottom:100px}.date-title{font-family:'Pretendard',sans-serif;font-size:30px;font-weight:500;letter-spacing:.015em;line-height:1;margin:0}.date-sub{font-weight:500;font-size:17px;margin:9px 0 31px}.calendar{border-top:1px solid #333;padding-top:24px;display:grid;grid-template-columns:repeat(7,1fr);row-gap:12px}.day-label,.calendar-day{height:34px;display:grid;place-items:center;font:17px 'Playfair Display',serif;color:#98918c}.day-label{font-size:15px}.calendar .sunday,.calendar .holiday{color:#c2584f}.calendar .selected{border-radius:50%;background:#c8c4bf;color:#fff;width:35px;margin:auto}.gallery-section{padding:65px 15px 110px}.gallery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;margin-top:40px}.gallery-item{position:relative;aspect-ratio:1/1.16;border:0;padding:0;background:#35312f;color:#ddd;overflow:hidden}.gallery-item img{width:100%;height:100%;object-fit:cover;display:block}.gallery-item .missing{position:absolute;inset:0;display:grid;place-items:center;color:#777;font:22px var(--display)}.gallery-item img:not([style*='none'])+.missing{display:none}.more-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;flex-direction:column;font:18px var(--display);letter-spacing:.2em}.more-overlay small{font:10px var(--font);letter-spacing:.25em;margin-top:4px}.letters-section{padding-top:90px;padding-bottom:135px}.section-heading{font-size:44px;margin:0 0 25px}.support-copy{font-size:15px;line-height:2;color:#aaa29e}.envelope{position:relative;width:min(100%,275px);height:180px;background:#ede9db;margin:44px auto 0;border:0;box-shadow:0 5px 22px rgba(0,0,0,.25);color:#383431;overflow:hidden}.envelope:before,.envelope:after{content:'';position:absolute;bottom:-75px;width:260px;height:260px;border:1px solid #c9c3b5;transform:rotate(45deg)}.envelope:before{left:-196px}.envelope:after{right:-196px}.envelope-top{position:absolute;top:-137px;left:25px;width:225px;height:225px;transform:rotate(45deg);border-right:2px solid #bbb5a8;border-bottom:2px solid #bbb5a8}.envelope-text{position:relative;display:grid;gap:14px;z-index:1;place-items:center}.envelope-text small{letter-spacing:.2em;color:#a49d90;font-size:9px}.envelope-text b{font:25px/1.1 var(--display)}.hint{font-size:12px;color:#69625f;margin:13px 0 42px}.pill{min-width:154px;border:1px solid #5d5957;border-radius:60px;background:#2a2929;color:#ddd;padding:17px 28px;font-size:14px;letter-spacing:.07em}.pill:active{transform:scale(.98)}.location-section{padding-top:85px;padding-bottom:95px}.location-name{font-size:22px;margin:43px 0 9px;color:#dad4d0}.location-detail{font-size:15px;line-height:1.9;color:#89817c;margin:0 0 34px}.kakao-map{height:226px;background:#e8e4dc;color:#777;display:grid;place-items:center}.map-placeholder{font-size:13px;padding:20px}.map-links{display:flex;gap:6px;margin-top:26px}.map-links a{flex:1;min-width:0;border:1px solid #494747;background:#252424;border-radius:35px;padding:12px 1px;font-size:12px;color:#c8c1bd}.transit{margin-top:48px;font-size:14px;line-height:1.9;color:#96908c}.transit h3{font-size:15px;margin:36px 0 8px;color:#c9c3c0}.transit p{margin:0}.rsvp-section{padding:110px 17px 120px}.rsvp-section .support-copy{margin-bottom:43px}.account-section{padding:60px 22px 100px}.account-section>.support-copy{margin:37px 0 50px}.accordion-title{width:100%;padding:18px 0;border:0;background:none;color:#d2cbc7;text-align:left;font-weight:600;font-size:15px;display:flex;justify-content:space-between}.accordion-title span{font-size:26px;line-height:15px;color:#999}.accordion-body{display:none;text-align:left}.accordion-title[aria-expanded=true]+.accordion-body{display:block}.bank-row{padding:23px 8px 23px 12px;display:flex;justify-content:space-between;align-items:center;background:#151515;margin:5px 0}.bank-row strong,.bank-row small{display:block}.bank-row strong{font-size:14px}.bank-row small{color:#89827e;font-size:12px;margin-top:8px}.bank-row button{background:#262626;border:1px solid #4d4a49;color:#ddd;width:36px;height:36px;font-size:24px}.gratitude-section{background:#0d0d0d;padding:112px 22px 105px;font-size:15px;line-height:2;color:#96908b}.gratitude-section h2{font-size:18px;font-weight:500;margin:45px 0 23px;color:#d7d0cc}.gratitude-section p:not(.eyebrow){margin:18px 0 34px}.footer{background:#0b0b0b;padding:80px 20px 27px}.footer>.support-copy{margin:23px 0 39px}.share-actions{display:flex;justify-content:center;gap:37px}.share-actions button{border:0;background:none;color:#a19a95;font-size:10px;letter-spacing:.2em;display:grid;justify-items:center;gap:11px}.share-circle{width:45px;height:45px;border-radius:50%;background:#212121;display:grid;place-items:center}.share-circle svg{width:23px;height:23px;fill:none;stroke:#bdb5b0;stroke-width:1.5}.share-actions button:first-child svg{fill:#bdb5b0;stroke:none}.copyright{margin-top:115px;color:#5c5551;font-size:10px;letter-spacing:.12em}.overlay{position:fixed;z-index:100;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:20px}.overlay[hidden]{display:none!important}.dialog{width:min(100%,340px);background:#1e1c1c;border:1px solid #5c514c;text-align:center;padding:45px 25px;color:#e3dcd7}.dialog h2{font:57px var(--display);margin:25px 0}.dialog p:not(.eyebrow){line-height:2}.light-pill{background:#e9e5df;color:#24201d;margin-top:26px}.lightbox-shell{max-width:600px;width:100%;position:relative;text-align:center}.lightbox-shell img{max-width:100%;max-height:75dvh;object-fit:contain}.modal-x{position:absolute;right:12px;top:12px;font-size:30px;color:#eee;background:transparent;border:0;z-index:2}.lightbox-controls{display:flex;align-items:center;justify-content:center;gap:35px;margin-top:15px}.lightbox-controls button,.letter-pagination button{background:none;border:0;color:#eee;font-size:30px}.letter-sheet{width:min(100%,350px);max-height:83dvh;overflow:auto;position:relative;background:#eeeae0;color:#282321;padding:42px 24px 35px;text-align:center;border-radius:3px}.letter-sheet .modal-x{color:#333}.letter-sheet h2{font-size:32px;margin:0 0 35px}.letter-messages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 20px;min-height:250px;text-align:left}.letter-message{font-size:13px;line-height:1.5;overflow-wrap:anywhere}.letter-message small{display:block;text-align:right;color:#aaa;margin-top:8px}.letter-pagination{display:flex;justify-content:center;align-items:center;gap:22px;color:#777}.letter-pagination button{color:#666}.sheet-overlay{align-items:end;padding:0}.bottom-sheet{width:min(100%,430px);max-height:92dvh;overflow:auto;position:relative;background:#f8f6f3;color:#222;padding:20px 24px 34px;border-radius:18px 18px 0 0}.sheet-handle{width:35px;height:4px;border-radius:5px;background:#ccc;margin:0 auto 20px}.bottom-sheet .modal-x{color:#444}.bottom-sheet h2{text-align:center;font-size:38px;margin:10px 0}.form-intro{text-align:center;color:#888;margin-bottom:29px}.bottom-sheet fieldset{border:0;padding:0;margin:0 0 26px}.bottom-sheet legend,.field-label{font-size:14px;font-weight:600;margin-bottom:12px;display:block}.bottom-sheet em{color:#cc6148;font-style:normal}.choice{display:flex;gap:7px}.choice label{flex:1;cursor:pointer}.choice input{position:absolute;opacity:0}.choice span{display:block;text-align:center;border:1px solid #ddd;background:#fff;border-radius:6px;padding:13px 3px;font-size:13px}.choice input:checked+span{border-color:#191919;background:#232323;color:#fff}.field-label{margin-top:22px}.field-label input,.field-label textarea{display:block;width:100%;margin-top:10px;padding:14px;border:1px solid #d6d3ce;background:white;border-radius:5px;color:#222}.stepper{margin-top:12px;display:flex;align-items:center;justify-content:space-between;max-width:155px}.stepper button{border:1px solid #ccc;background:#fff;width:34px;height:34px;border-radius:50%}.form-error{min-height:20px;color:#b83a26;font-size:12px}.submit{display:block;width:100%;background:#222;color:white;margin-top:20px}.submit:disabled{opacity:.4;cursor:not-allowed}.toast{position:fixed;z-index:200;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#f6f3ee;color:#222;border-radius:8px;padding:13px 21px;font-size:13px;opacity:0;transition:.25s;pointer-events:none}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}body.modal-open{overflow:hidden}@media(min-width:600px){.cover{min-height:850px;height:auto}.cover-top{padding-top:34px}.cover-inner{padding:30px 20px 22px}.cover-meta{margin-top:-6px;padding:12px 20px 24px}}@media(max-width:360px){.cover-datetime{gap:6px}.cover-when,.cover-where{font-size:14px}.couple{font-size:24px}.cover-date{font-size:14px}.cover-inner{padding:16px 16px 16px}.cover-meta{margin-top:-6px;padding:8px 16px 20px}.family{font-size:13px}.display-intro{font-size:1.875rem}.map-links a{font-size:11px}.poem{font-size:14px}.share-actions{gap:24px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+/* Cover date, time and venue typography */
+.intro-meta, .intro-meta .cover-date, .intro-meta .cover-when, .intro-meta .cover-where { font-family: "Pretendard", "Apple SD Gothic Neo", sans-serif; font-size: 15px; letter-spacing: 0.04em; }
+
+/* Cover date, time, and location typography */
+.cover-meta.intro-meta .cover-datetime { margin: 0; display: flex; justify-content: center; align-items: baseline; gap: .4em; flex-wrap: nowrap; }
+.cover-meta.intro-meta .cover-date,
+.cover-meta.intro-meta .cover-when,
+.cover-meta.intro-meta .cover-where { margin: 0; font-family: "Noto Sans KR", sans-serif; font-size: 24px; font-weight: 400; line-height: 1.5; letter-spacing: .01em; color: #4A260D; }
+.cover-meta.intro-meta .cover-where { display: block; }
+
+/* cover meta size override */
+.cover-meta.intro-meta .cover-datetime,
+.cover-meta.intro-meta .cover-date,
+.cover-meta.intro-meta .cover-when,
+.cover-meta.intro-meta .cover-where {
+  font-size: 14px !important;
+}
+
+/* Cover date/time and venue: one step smaller, one step more line height */
+.cover-meta.intro-meta .cover-datetime,
+.cover-meta.intro-meta .cover-date,
+.cover-meta.intro-meta .cover-when,
+.cover-meta.intro-meta .cover-where { font-size: 13px !important; }
+.cover-meta.intro-meta .cover-date,
+.cover-meta.intro-meta .cover-when,
+.cover-meta.intro-meta .cover-where { line-height: 1.6; }
+
+/* Cover ampersand */
+.couple em.wedding-text {
+  font-family: "Urbanist", "Noto Sans KR", sans-serif;
+  font-weight: 100 !important;
+  letter-spacing: 0.15em !important;
+  font-size: 0.5em;
+  color: #000000;
+  opacity: 0.5;
+  text-align: center;
+  white-space: nowrap;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  flex-shrink: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Keep the memorial icon aligned with the existing family typography */
+.family .family-memorial{display:inline-block;width:15px;height:15px;object-fit:contain;vertical-align:-2px;margin-right:3px;}
+
+/* Invitation description typography */
+.invitation-description {
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 32px;
+  color: #D4CFC8;
+  opacity: 0.9;
+  text-align: center;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Lucide-style copy icon in account rows */
+.bank-row button[data-copy]{display:inline-flex;align-items:center;justify-content:center;padding:0;}
+.bank-row button[data-copy] svg{width:18px;height:18px;display:block;fill:none;stroke:currentColor;}
+
+/* Cover typography: fixed size across mobile and desktop */
+.cover .cover-kicker { font-size: 12px; }
+.cover .couple,
+.cover .couple span { font-size: 24px; }
+.cover .couple em.wedding-text { font-size: 12px; }
+.cover .cover-meta.intro-meta .cover-date,
+.cover .cover-meta.intro-meta .cover-when,
+.cover .cover-meta.intro-meta .cover-where { font-size: 13px !important; }
+
+/* You're Invited: Urbanist styling provided by user */
+.cover .cover-kicker {
+  color: #000000 !important;
+  text-align: center;
+  margin: 0 0 0.75rem;
+  font-family: "Urbanist", "Noto Sans KR", sans-serif;
+  font-weight: 100 !important;
+  letter-spacing: 0.15em !important;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  opacity: 0.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cover date, time and location typography (requested) */
+.cover .cover-meta.intro-meta {
+  margin-top: 1.25rem;
+  color: rgb(0, 0, 0);
+  opacity: 0.6;
+  text-align: center;
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 87.5% !important;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+.cover .cover-meta.intro-meta .cover-date,
+.cover .cover-meta.intro-meta .cover-when,
+.cover .cover-meta.intro-meta .cover-where {
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 100% !important;
+  font-weight: 400;
+  line-height: inherit;
+  letter-spacing: 0.01em;
+  color: inherit;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Responsive wedding names: container query units */
+.cover .wedding-cover {
+  width: 100%;
+  padding: 0 24px;
+  container-type: inline-size;
+  text-align: center;
+}
+.cover .wedding-names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  font-size: clamp(0.99rem, 12.87cqi, 2.97rem);
+  transition: all 300ms;
+  margin: 0;
+  font-weight: 400;
+}
+.cover .wedding-names .wedding-name {
+  display: block;
+  font-family: "Ortica", "Noto Sans KR", sans-serif;
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+.cover .wedding-names .wedding-text {
+  font-family: "Urbanist", "Noto Sans KR", sans-serif;
+  font-weight: 100 !important;
+  letter-spacing: 0.15em !important;
+  font-size: 0.5em;
+  font-style: normal;
+  line-height: inherit;
+  color: #000000;
+  opacity: 0.5;
+  text-align: center;
+  white-space: nowrap;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Full-width on mobile; retain centered 430px invitation on desktop */
+@media (max-width: 599px) {
+  .page { width: 100%; max-width: none; margin: 0 auto; }
+  .site-header, .menu { width: 100%; max-width: none; }
+  .audio-toggle { right: 14px; }
+  .bottom-sheet { width: 100%; max-width: none; }
+}
+@media (min-width: 600px) {
+  .page { width: 430px; max-width: 100%; margin: 0 auto; }
+  .site-header, .menu { width: 430px; max-width: 100%; }
+  .audio-toggle { right: calc((100vw - 430px) / 2 + 14px); }
+}
+
+/* Cover: full-width image, vertically fitted to the remaining first screen */
+.cover {
+  height: 100svh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.cover-top, .cover-meta {
+  flex: 0 0 auto;
+}
+.cover-photo {
+  width: 100%;
+  flex: 1 1 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0 0 20px;
+  background: var(--orange);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.cover-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  object-position: center top;
+  transform: none;
+  clip-path: inset(70px 0 0 0);
+  filter: grayscale(1);
+}
+
+/* Short viewports: preserve the people instead of cropping their photo. */
+@media (max-height: 700px) and (max-width: 599px) {
+  .cover {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+  .cover-top { padding-top: 38px; }
+  .cover-inner { padding-top: 8px; padding-bottom: 8px; }
+  .cover-meta, .cover-meta.intro-meta {
+    padding-top: 4px;
+    padding-bottom: 8px;
+  }
+  .cover-photo {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 0;
+    padding: 0 0 20px;
+    overflow: hidden;
+  }
+  .cover-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    object-position: center top;
+    transform: none;
+    clip-path: inset(70px 0 0 0);
+  }
+}
+
+/* D-DAY modal — requested styles */
+.wedding-dday-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(8, 10, 15, 0.58);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.wedding-dday-modal.is-hidden,
+.wedding-dday-modal[hidden] { display: none !important; }
+.wedding-dday-modal .wedding-dday-card {
+  width: min(100%, 320px);
+  padding: 34px 24px 22px;
+  border: 0;
+  border-radius: 18px;
+  background: #f5f8fb;
+  color: #171922;
+  text-align: center;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+}
+.wedding-dday-modal .wedding-dday-label {
+  margin: 0 0 18px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 40px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: normal;
+  color: #4E2810;
+}
+.wedding-dday-modal .wedding-dday-copy {
+  margin: 0 0 28px;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.75;
+  color: #57515a;
+}
+.wedding-dday-modal .wedding-dday-close {
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 18px;
+  background: #171922;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Gallery album: full-screen sheet, based on RSVP bottom sheet */
+.album-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  background: rgba(0, 0, 0, .8);
+  padding: 0;
+  align-items: stretch;
+  justify-content: center;
+}
+.album-sheet {
+  position: relative;
+  width: min(100%, 430px);
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow-y: auto;
+  background: #f8f6f3;
+  color: #222;
+  padding: 20px 20px max(34px, env(safe-area-inset-bottom));
+  border-radius: 0;
+  -webkit-overflow-scrolling: touch;
+}
+.album-handle {
+  width: 35px;
+  height: 4px;
+  border-radius: 5px;
+  background: #ccc;
+  margin: 0 auto 20px;
+}
+.album-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  border: 0;
+  background: transparent;
+  color: #444;
+  font-size: 30px;
+  line-height: 1;
+}
+.album-title {
+  font-family: var(--display);
+  font-size: 38px;
+  font-weight: 400;
+  text-align: center;
+  margin: 12px 0 8px;
+}
+.album-subtitle {
+  font-size: 13px;
+  text-align: center;
+  color: #888;
+  margin: 0 0 28px;
+}
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+.album-item {
+  border: 0;
+  padding: 0;
+  background: #e7e3df;
+  aspect-ratio: 1 / 1.14;
+  overflow: hidden;
+}
+.album-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (max-width:599px) {
+  .album-sheet { width: 100%; }
+}
+
+/* Expanded gallery: keep the return/close button outside the photograph */
+#lightbox .lightbox-shell { display:flex; flex-direction:column; align-items:center; }
+#lightbox .lightbox-topbar { display:flex; justify-content:flex-end; width:100%; padding:0 4px 12px; flex:0 0 auto; }
+#lightbox #closeGalleryPhoto { position:static; display:grid; place-items:center; width:40px; height:40px; padding:0; border-radius:50%; background:rgba(255,255,255,.14); color:#fff; font-size:28px; line-height:1; }
+#lightbox #lightboxImage { display:block; max-height:calc(100dvh - 180px); max-width:100%; width:auto; height:auto; }
+
+/* Keep enlarged photo isolated from the album and the page beneath. */
+#galleryAlbum[hidden], #lightbox[hidden] { display: none !important; visibility: hidden !important; }
+#galleryAlbum { z-index: 110; }
+#lightbox { z-index: 130; background: #000; }
+#lightbox .lightbox-shell { position: relative; z-index: 1; }
+
+/* Single-photo navigation: subdued neutral arrows at left and right edges */
+#lightbox .lightbox-photo-stage { position:relative; display:flex; justify-content:center; align-items:center; width:100%; min-height:0; }
+#lightbox .lightbox-photo-stage #lightboxImage { display:block; width:auto; height:auto; max-width:100%; max-height:calc(100dvh - 180px); object-fit:contain; }
+#lightbox .lightbox-side-arrow { position:absolute; z-index:3; top:50%; transform:translateY(-50%); display:grid; place-items:center; width:44px; height:52px; padding:0; border:0; border-radius:24px; background:transparent; box-shadow:none; color:#A0A0A0; cursor:pointer; touch-action:manipulation; }
+#lightbox .lightbox-side-prev { left:4px; }
+#lightbox .lightbox-side-next { right:4px; }
+#lightbox .lightbox-side-arrow svg { width:32px; height:32px; fill:none; stroke:currentColor; stroke-width:1; stroke-linecap:round; stroke-linejoin:round; }
+#lightbox .lightbox-side-arrow:focus-visible { outline:2px solid #d2d2d2; outline-offset:2px; }
+#lightbox .lightbox-controls { margin-top:14px; color:#bbb; font-size:15px; }
+
+/* Single-photo close control: no button fill, same visual treatment as arrows. */
+#lightbox #closeGalleryPhoto { background: transparent !important; border: 0 !important; box-shadow: none !important; color: #A0A0A0; border-radius: 0; }
+#lightbox #closeGalleryPhoto:focus-visible { outline: 2px solid #d2d2d2; outline-offset: 2px; }
+
+/* Enlarge photos to available viewport width without cropping or distortion. */
+#lightbox { padding: 0; }
+#lightbox .lightbox-shell { width:100%; max-width:none; }
+#lightbox .lightbox-photo-stage { width:100%; }
+#lightbox .lightbox-photo-stage #lightboxImage {
+  width:100%; height:auto; max-width:none;
+  max-height:calc(100dvh - 140px);
+  object-fit:contain;
+}
+
+/* RSVP dedicated completion dialog */
+#successModal .rsvp-success-dialog{border-radius:16px;padding:42px 24px 26px;}
+#successModal .rsvp-success-dialog p{margin:0;line-height:2;font-size:16px;}
+#successModal .rsvp-success-dialog .light-pill{margin-top:26px;min-width:130px;}
+
+/* RSVP completion popup — user-specified style */
+.rsvp-success-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10080;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.rsvp-success-modal[hidden] { display: none !important; }
+.rsvp-success-modal.is-open { display: flex; }
+.rsvp-success-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 9, 14, 0.55);
+}
+.rsvp-success-card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 310px);
+  padding: 30px 22px 20px;
+  border-radius: 18px;
+  background: #fff;
+  color: #171922;
+  text-align: center;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.2);
+}
+.rsvp-success-card p {
+  margin: 0 0 24px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+.rsvp-success-close {
+  width: 100%;
+  height: 46px;
+  border: 0;
+  border-radius: 12px;
+  background: #171922;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Ampersand scales at 60% of responsive name font size. */
+.cover .wedding-names .wedding-text { font-size: 0.6em; }
