@@ -553,3 +553,181 @@
 /* Wedding day fireworks: above backdrop, behind card; never intercept clicks. */
 .wedding-dday-modal .dday-fireworks{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
 .wedding-dday-modal .wedding-dday-card{position:relative;z-index:1;}
+
+
+/* Letters to Us heading: requested Ortica typography */
+#letters .section-heading {
+  font-family: "Ortica", "Noto Sans KR", sans-serif;
+  font-weight: inherit;
+  margin: 0 0 1.5rem;
+  font-size: 1.875rem;
+  line-height: 1.25;
+  letter-spacing: -0.04em;
+  color: rgb(212, 207, 200);
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Letters to Us supporting invitation copy */
+#letters > p.support-copy {
+  margin: 0 0 1.5rem;
+  font-family: "Noto Sans KR", sans-serif;
+  color: rgb(212, 207, 200);
+  text-align: center;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  font-size: 0.875rem;
+  font-weight: 300;
+  line-height: 1.75rem;
+  opacity: 0.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+/* Letters to Us envelope image: use uploaded envelope photo */
+#letters .envelope {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  background: transparent;
+}
+
+#letters .envelope::before,
+#letters .envelope::after,
+#letters .envelope .envelope-top {
+  display: none;
+}
+
+#letters .envelope .envelope-image {
+  display: block;
+  vertical-align: middle;
+  max-width: 100%;
+  user-select: none;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+#letters .envelope .envelope-text {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 14px;
+  padding: 20px;
+}
+
+#letters .envelope .envelope-text small,
+#letters .envelope .envelope-text b {
+  text-shadow: 0 1px 1px rgba(255,255,255,0.35);
+}
+
+/* Envelope layout matched to reference site's proportions and typography */
+#letters .envelope {
+  width: 18rem;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 716 / 507;
+  border: 0;
+  border-radius: 0;
+  margin-top: 0.75rem;
+  transition: transform 300ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+#letters .envelope:active { transform: scale(0.98); }
+#letters .envelope .envelope-text {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 1.5rem;
+  pointer-events: none;
+  color: #3D3A34;
+  text-align: center;
+}
+#letters .envelope .envelope-text small {
+  font-family: "Urbanist", "Noto Sans KR", sans-serif;
+  font-size: 0.5rem;
+  font-weight: 400;
+  letter-spacing: 0.35em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  opacity: 0.75;
+}
+#letters .envelope .envelope-text b {
+  font-family: "Ortica", "Noto Sans KR", sans-serif;
+  font-size: 1.8rem;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+/* Reference guestbook: image-backed 3:4 paper and scattered messages */
+#lettersModal .reference-letter-sheet{position:relative;width:min(100%,330px);max-width:330px;display:flex;flex-direction:column;align-items:center;background:transparent;padding:0;box-shadow:none;overflow:visible}
+#lettersModal .reference-letter-sheet>.modal-x{position:absolute;right:0;top:-38px;color:#fff;z-index:5;background:transparent}
+#lettersModal .letter-paper{position:relative;width:100%;aspect-ratio:3/4;overflow:hidden;background:transparent}
+#lettersModal .letter-paper-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;user-select:none}
+#lettersModal .letter-paper>.display{position:absolute;top:6%;left:0;width:100%;margin:0;padding:0 20px;text-align:center;font-family:"Ortica",serif;font-size:20px;font-weight:400;line-height:1.2;color:#3d3a34;z-index:1}
+#lettersModal .letter-paper .letter-messages{position:absolute;inset:0;display:block;margin:0;padding:0;overflow:hidden}
+#lettersModal .letter-paper .letter-message{position:absolute;max-width:45%;width:43%;transform:translate(-50%,-50%);background:transparent;border:0;box-shadow:none;padding:0;color:#1a1a1a;text-align:left;font-family:"Noto Sans KR",sans-serif;font-size:10px;font-weight:400;line-height:14px;overflow-wrap:anywhere}
+#lettersModal .letter-message p{font-size:10px;line-height:14px;margin:0;white-space:pre-wrap;word-break:keep-all}
+#lettersModal .letter-message small{display:block;margin-top:8px;font-size:9px;line-height:13px;text-align:right;color:#9b958e}
+#lettersModal .letter-pagination{display:flex;align-items:center;justify-content:center;gap:20px;width:100%;margin:18px 0 16px;color:#fff}
+#lettersModal .letter-pagination button{border:0;background:transparent;color:#fff;font-size:25px;cursor:pointer;padding:2px 8px}
+#lettersModal .letter-pagination button:disabled{opacity:.3;cursor:default}
+#lettersModal #lettersPage{font-size:11px;letter-spacing:5px;color:#fff;white-space:nowrap}
+#lettersModal #letterWrite{display:block;margin:0 auto;border:0;border-radius:999px;background:#fff;color:#171922;font-size:12px;padding:12px 23px}
+
+/* Guestbook: discreet delete action preserving the existing stationery layout */
+.letter-message-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:5px}
+.letter-message-footer small{margin-top:0!important}
+.letter-delete{background:none;border:0;color:#897d73;font-size:9px;padding:3px 1px;text-decoration:underline;text-underline-offset:2px}
+.letters-empty{position:absolute;top:45%;left:15%;right:15%;color:#776f69;font-size:12px;text-align:center}
+.delete-actions{display:flex;gap:12px;margin-top:18px}
+.delete-actions>.pill{flex:1;min-width:0}
+.cancel-pill{background:#eee!important;color:#333!important}
+
+/* Reference Letters to Us: tap to reveal a discreet delete icon. */
+#lettersModal .letter-message{overflow:visible;z-index:10}
+#lettersModal .letter-message.is-selected{z-index:20}
+#lettersModal .letter-message-content{display:block;width:100%;padding:3px 0;border:0;background:transparent;color:#1a1a1a;text-align:left;cursor:pointer;font:inherit;overflow-wrap:anywhere}
+#lettersModal .letter-message-content:focus-visible{outline:1px solid #7b766e;outline-offset:3px}
+#lettersModal .letter-trash{position:absolute;top:-10px;right:-10px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fff;border:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.12);color:#1a1a1a;cursor:pointer;animation:letterTrashAppear .2s ease both}
+#lettersModal .letter-trash[hidden]{display:none!important}
+@keyframes letterTrashAppear{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+/* Orange centered password dialog, matching reference site. */
+.guestbook-delete-overlay{z-index:190!important;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.4)}
+.guestbook-delete-dialog{width:min(320px,100%);padding:20px 22px 22px;background:#ff630f;border:1px solid rgba(0,0,0,.15);border-radius:0;color:#251409;animation:guestbookDialogUp .3s ease both}
+.guestbook-delete-dialog h2{margin:0 0 8px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;line-height:1.5;text-align:left}
+.guestbook-delete-help{margin:0 0 22px;font-size:10px;color:#79401d;line-height:1.6}
+.guestbook-delete-dialog input{display:block;width:100%;padding:9px 0 11px;border:0;border-bottom:1px solid #d9540b;outline:0;border-radius:0;background:transparent;color:#251409;font:12px 'Noto Sans KR',sans-serif}
+.guestbook-delete-dialog input::placeholder{color:#ffd0aa}
+.guestbook-delete-dialog input:focus{border-bottom-color:#7d350b}
+.guestbook-delete-dialog .form-error{color:#6f1710;min-height:14px;margin:6px 0 9px;line-height:1.3}
+.guestbook-delete-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.guestbook-delete-actions button{min-height:38px;background:transparent;border:1px solid #d85a12;border-radius:0;font-size:11px;color:#733b1d;cursor:pointer}
+.guestbook-delete-actions button:disabled{color:#ae6b45;opacity:.65;cursor:not-allowed}
+.guestbook-delete-actions button:not(:disabled):active{background:rgba(0,0,0,.1)}
+.visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@keyframes guestbookDialogUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Guestbook deletion confirmation beneath the letter, matching the reference */
+#lettersModal .guestbook-operation-success{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;color:rgba(255,255,255,.85);font-family:"Noto Sans KR",sans-serif;font-size:12px;font-weight:400;line-height:18px;text-align:center}
+#lettersModal .guestbook-operation-success[hidden]{display:none!important}
+#lettersModal .guestbook-operation-success svg{width:14px;height:14px;flex:none;stroke:#fff;stroke-width:1.5}
+#lettersModal .guestbook-operation-success.is-visible{animation:guestbookSuccessFadeIn 500ms ease-out both}
+#lettersModal .guestbook-operation-success:not([hidden])+.letter-pagination{margin-top:12px}
+@keyframes guestbookSuccessFadeIn{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){#lettersModal .guestbook-operation-success.is-visible{animation:none}}

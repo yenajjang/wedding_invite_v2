@@ -203,7 +203,171 @@ $('#stepMinus').addEventListener('click',()=>{companions=Math.max(0,companions-1
 const form=$('#rsvpForm');function validate(){const values=new FormData(form);$('#rsvpSubmit').disabled=!(values.get('side')&&values.get('attendance')&&String(values.get('name')||'').trim());}form.addEventListener('input',validate);form.addEventListener('change',validate);
 async function sendForm(url,payload){await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify(payload)});/* Apps Script doPost parses e.postData.contents as JSON. no-cors response is opaque; verify the new row in Google Sheets. */}
 form.addEventListener('submit',async e=>{e.preventDefault();if(!form.reportValidity())return;const values=new FormData(form);const payload={side:values.get('side')||'',attendance:values.get('attendance')||'',meal:values.get('meal')||'',name:String(values.get('name')||'').trim(),phone:String(values.get('phone')||'').trim(),companions};const error=$('#formError');error.textContent='';if(!isConfigured(cfg.rsvpScriptUrl)){error.textContent='RSVP 저장 서버가 연결되지 않았습니다. config.js를 설정해주세요.';return;}const submit=$('#rsvpSubmit');submit.disabled=true;submit.textContent='전송 중...';try{await sendForm(cfg.rsvpScriptUrl,payload);modal('rsvpModal',false);modal('successModal',true);form.reset();companions=0;updateCompanions();}catch{error.textContent='전송에 실패했습니다. 잠시 후 다시 시도해주세요.';}finally{submit.textContent='제출하기';validate();}});
-// Letters to Us was removed from the invitation; legacy event listeners removed.
+// Guestbook: JSONP reads avoid Apps Script redirects/CORS; POSTs are confirmed via operation status.
+let letters=[],letterPage=0,deleteTarget=null,selectedLetterId=null,lettersLoading=false;
+let guestbookSuccessTimer=null;
+function showGuestbookSuccess(message){
+ const status=$('#guestbookOperationSuccess');
+ status.querySelector('span').textContent=message;
+ clearTimeout(guestbookSuccessTimer);
+ status.hidden=false;
+ status.classList.remove('is-visible');
+ void status.offsetWidth; // Restart the fade-in for successive deletions.
+ status.classList.add('is-visible');
+ guestbookSuccessTimer=setTimeout(()=>hideGuestbookSuccess(),3000);
+}
+function hideGuestbookSuccess(){
+ clearTimeout(guestbookSuccessTimer);
+ const status=$('#guestbookOperationSuccess');
+ status.hidden=true;status.classList.remove('is-visible');
+}
+function guestbookJsonp(params){
+ return new Promise((resolve,reject)=>{
+  const url=cfg.guestbookScriptUrl;
+  if(!isConfigured(url)){reject(new Error('방명록 서버 URL을 설정해주세요.'));return;}
+  const callback='__guestbook_cb_'+Math.random().toString(36).slice(2);
+  const script=document.createElement('script');
+  const timer=setTimeout(()=>finish(new Error('서버 응답 시간이 초과되었습니다.')),12000);
+  function finish(err,data){clearTimeout(timer);delete window[callback];script.remove();err?reject(err):resolve(data);}
+  window[callback]=data=>finish(null,data);
+  script.onerror=()=>finish(new Error('방명록 조회에 실패했습니다.'));
+  const q=new URLSearchParams({...params,callback,_:Date.now()});
+  script.src=url+(url.includes('?')?'&':'?')+q.toString();document.head.append(script);
+ });
+}
+// Start loading the list in the background so the first open can use prepared data.
+// Keep a brief memory cache to avoid repeated Apps Script cold starts.
+const LETTER_CACHE_MS=45000;
+let letterCacheAt=0,letterListRequest=null,letterListVersion=0;
+function fetchLetters(force=false){
+ if(!force && letterCacheAt && Date.now()-letterCacheAt<LETTER_CACHE_MS)return Promise.resolve(letters);
+ if(letterListRequest && !force)return letterListRequest;
+ const version=++letterListVersion;
+ const pending=guestbookJsonp({action:'list'}).then(result=>{
+  if(!result.success)throw Error(result.error||'조회 실패');
+  if(version===letterListVersion){
+   letters=Array.isArray(result.messages)?result.messages:[];
+   letterCacheAt=Date.now();
+  }
+  return letters;
+ });
+ letterListRequest=pending;
+ pending.finally(()=>{if(letterListRequest===pending)letterListRequest=null;}).catch(()=>{});
+ return pending;
+}
+async function refreshLetters(force=false){
+ // Show the currently cached messages immediately, without loading text.
+ if(letterCacheAt)renderLetters();
+ try{
+  await fetchLetters(force);
+  renderLetters();
+ }catch(err){
+  if(!letterCacheAt)$('#letterMessages').textContent=err.message;
+  else console.warn('방명록 최신 목록 조회 실패:',err);
+ }
+}
+// Prefetch once after the page boot; do not block other UI initialization.
+if(isConfigured(cfg.guestbookScriptUrl)){
+ const preload=()=>fetchLetters().catch(()=>{});
+ if(document.readyState==='complete')setTimeout(preload,100);
+ else window.addEventListener('load',()=>setTimeout(preload,100),{once:true});
+}
+
+function renderLetters(){
+ const perPage=5,total=Math.max(1,Math.ceil(letters.length/perPage));
+ letterPage=Math.max(0,Math.min(letterPage,total-1));
+ selectedLetterId=null;
+ const positions=[[28,28],[72,38],[28,68],[68,82],[62,57]];
+ const items=letters.slice(letterPage*perPage,(letterPage+1)*perPage);
+ const nodes=items.map((item,i)=>{
+  const div=document.createElement('div');div.className='letter-message';
+  div.style.left=positions[i][0]+'%';div.style.top=positions[i][1]+'%';
+  const content=document.createElement('button');content.type='button';content.className='letter-message-content';
+  content.setAttribute('aria-label',item.name+'님의 방명록 선택');content.setAttribute('aria-pressed','false');
+  const msg=document.createElement('p');msg.textContent=item.message;
+  const name=document.createElement('small');name.textContent=item.name;
+  content.append(msg,name);
+  const remove=document.createElement('button');remove.type='button';remove.className='letter-trash';
+  remove.setAttribute('aria-label',item.name+'님의 방명록 삭제');remove.hidden=true;
+  remove.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 10v6M14 10v6"/></svg>';
+  content.addEventListener('click',()=>{
+    const next=selectedLetterId===item.id?null:item.id;
+    selectedLetterId=next;
+    document.querySelectorAll('#letterMessages .letter-message').forEach(el=>{
+      const active=el.dataset.id===String(next);
+      el.classList.toggle('is-selected',active);
+      el.querySelector('.letter-trash').hidden=!active;
+      el.querySelector('.letter-message-content').setAttribute('aria-pressed',String(active));
+    });
+  });
+  remove.addEventListener('click',event=>{
+    event.stopPropagation();deleteTarget=item.id;
+    $('#guestbookDeleteError').textContent='';$('#guestbookDeleteForm').reset();
+    updateGuestbookDeleteButton();modal('guestbookDeleteModal',true);
+    $('#guestbookDeleteForm').elements.password.focus();
+  });
+  div.dataset.id=String(item.id);div.append(content,remove);return div;
+ });
+ if(!nodes.length){const empty=document.createElement('p');empty.className='letters-empty';empty.textContent='첫 번째 축하 메시지를 남겨주세요.';nodes.push(empty);}
+ $('#letterMessages').replaceChildren(...nodes);
+ $('#lettersPage').textContent=Array.from({length:total},(_,i)=>i===letterPage?'●':'○').join(' ');
+ $('#lettersPrev').disabled=letterPage===0;$('#lettersNext').disabled=letterPage===total-1;
+}
+async function confirmedGuestbookPost(payload){
+ const requestId='req_'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random().toString(36).slice(2));
+ await sendForm(cfg.guestbookScriptUrl,{...payload,requestId});
+ for(let n=0;n<10;n++){
+  await new Promise(r=>setTimeout(r,n<3?500:1100));
+  try{
+   const state=await guestbookJsonp({action:'status',requestId});
+   if(state.status==='success')return state;
+   if(state.status==='error')throw Error(state.error||'처리에 실패했습니다.');
+  }catch(err){if(n===9)throw err;if(err.message.includes('처리에 실패')||err.message.includes('비밀번호'))throw err;}
+ }
+ throw Error('처리 결과를 확인하지 못했습니다. 시트를 확인한 후 다시 시도해주세요.');
+}
+function openLetters(){hideGuestbookSuccess();letterPage=0;selectedLetterId=null;modal('lettersModal',true);refreshLetters();}
+$('#openLetters').addEventListener('click',openLetters);
+$('#lettersPrev').addEventListener('click',()=>{letterPage--;renderLetters();});
+$('#lettersNext').addEventListener('click',()=>{letterPage++;renderLetters();});
+function openGuestbook(){modal('lettersModal',false);modal('guestbookModal',true)}
+$('#guestbookButton').addEventListener('click',openGuestbook);$('#letterWrite').addEventListener('click',openGuestbook);
+$('#guestbookForm').addEventListener('submit',async e=>{
+ e.preventDefault();const f=e.currentTarget;if(!f.reportValidity())return;
+ const {name,message,password}=f.elements;
+ const error=$('#guestbookError');error.textContent='';const submit=f.querySelector('[type=submit]');submit.disabled=true;submit.textContent='저장 중...';
+ try{
+   const createdName=name.value.trim(),createdMessage=message.value.trim();
+   const result=await confirmedGuestbookPost({action:'create',name:createdName,message:createdMessage,password:password.value});
+   // A confirmed save should become visible immediately, independent of the list round-trip.
+   ++letterListVersion; // Ignore results from any older in-flight list request.
+   letterListRequest=null;
+   letters=[{id:String(result.id),name:createdName,message:createdMessage},...letters.filter(item=>String(item.id)!==String(result.id))];
+   letterPage=0;selectedLetterId=null;letterCacheAt=0;
+   f.reset();modal('guestbookModal',false);modal('lettersModal',true);
+   renderLetters();showGuestbookSuccess('소중한 메시지가 등록되었습니다');
+   // Synchronize the rest of the list without blocking or clearing the success feedback.
+   void refreshLetters(true);
+  }
+ catch(err){error.textContent=err.message||'저장에 실패했습니다.';}
+ finally{submit.disabled=false;submit.textContent='방명록 남기기';}
+});
+function updateGuestbookDeleteButton(){
+ const form=$('#guestbookDeleteForm');
+ const value=form.elements.password.value;
+ const button=form.querySelector('[type=submit]');
+ button.disabled=!/^\d{4}$/.test(value);
+}
+$('#guestbookDeleteForm').elements.password.addEventListener('input',updateGuestbookDeleteButton);
+$('#guestbookDeleteForm').addEventListener('submit',async e=>{
+ e.preventDefault();const f=e.currentTarget;if(!f.reportValidity()||!deleteTarget)return;
+ const error=$('#guestbookDeleteError');error.textContent='';const submit=f.querySelector('[type=submit]');submit.disabled=true;submit.textContent='확인 중...';
+ try{await confirmedGuestbookPost({action:'delete',id:deleteTarget,password:f.elements.password.value});
+   deleteTarget=null;f.reset();modal('guestbookDeleteModal',false);letterCacheAt=0;await refreshLetters(true);showGuestbookSuccess('쪽지가 삭제되었습니다');}
+ catch(err){error.textContent=err.message||'삭제에 실패했습니다.';}
+ finally{submit.textContent='삭제하기';updateGuestbookDeleteButton();}
+});
+
 // Share
 const linkButton = document.querySelector('[data-share="link"]');
 const topButton = document.querySelector('[data-share="top"]');
