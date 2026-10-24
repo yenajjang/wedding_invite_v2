@@ -481,3 +481,15 @@
 .cover { height:auto; min-height:0; overflow:visible; }
 .cover-photo { width:100%; height:auto; flex:0 0 auto; min-height:0; padding:0; margin:0; overflow:hidden; }
 .cover-photo img { display:block; width:100%; height:auto; object-fit:contain; }
+
+
+/* Move the full cover text group 20px up without shifting the photo down. */
+.cover-top,
+.cover-meta.intro-meta {
+  position: relative;
+  top: -20px;
+}
+/* Remove previously added photo spacing; the raised text supplies the visual gap. */
+.cover-photo {
+  margin-top: 0 !important;
+}
