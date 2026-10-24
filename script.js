@@ -75,36 +75,87 @@ setTimeout(()=>{modal('dDayModal',true);startDdayFireworks();},450);
 // Lightweight D-DAY-only firework animation; no external libraries.
 function startDdayFireworks(){
   const canvas=$('#ddayFireworks');
-  if(!canvas || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const ctx=canvas.getContext('2d');
-  if(!ctx)return;
+  if(!canvas || window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const ctx=canvas.getContext('2d');if(!ctx)return;
   const modalEl=$('#dDayModal');
-  let particles=[], previous=0, start=0, frame=0, nextBurst=0;
-  const colors=['#f6d68c','#f4ead4','#e0c285','#c9d1d7','#ffffff'];
-  function fit(){const dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(canvas.clientWidth*dpr);canvas.height=Math.round(canvas.clientHeight*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);}
-  fit();
-  const onResize=()=>fit();window.addEventListener('resize',onResize);
-  function burst(){
-    const w=canvas.clientWidth,h=canvas.clientHeight;
-    const x=w*(.12+Math.random()*.76),y=h*(.16+Math.random()*.45);
-    for(let i=0;i<38;i++){
-      const a=2*Math.PI*i/38+(Math.random()-.5)*.13,v=1.6+Math.random()*2.3;
-      particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,r:.8+Math.random()*1.8,color:colors[Math.floor(Math.random()*colors.length)]});
+  if(window.__ddayFireworksCleanup)window.__ddayFireworksCleanup();
+  let particles=[],rings=[],start=0,last=0,raf=0,burstAt=0,bursts=0,ended=false;
+  const gold=['#ffe5a3','#ffd064','#ffae36','#fff7e5','#eacb8a','#ffeefa'];
+  const palette=['#fff0aa','#ffd068','#ffffff','#ffa88e','#d0d9ff','#ffb9dc'];
+  const rand=(a,b)=>a+Math.random()*(b-a);
+  function fit(){
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    canvas.width=Math.round(canvas.clientWidth*dpr);
+    canvas.height=Math.round(canvas.clientHeight*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  fit();window.addEventListener('resize',fit);
+  function launch(x,y,n,force){
+    const col=palette[Math.floor(Math.random()*palette.length)];
+    rings.push({x,y,r:4,alpha:.85,col});
+    for(let i=0;i<n;i++){
+      const a=2*Math.PI*(i/n)+rand(-.045,.045);
+      const v=rand(force*.55,force*1.3);
+      particles.push({x,y,px:x,py:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,
+        life:rand(.7,1.15),decay:rand(.010,.020),r:rand(.9,2.5),
+        col:Math.random()<.65?gold[Math.floor(Math.random()*gold.length)]:col,
+        spark:Math.random()<.48});
     }
   }
-  function cleanup(){cancelAnimationFrame(frame);window.removeEventListener('resize',onResize);ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);}
-  function draw(t){
-    if(!start)start=t;
-    const dt=Math.min((t-(previous||t))/16.67,2);previous=t;
-    ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
-    if(modalEl.hidden || t-start>4800){cleanup();return;}
-    if(t>=nextBurst && t-start<3300){burst();nextBurst=t+360+Math.random()*340;}
-    particles=particles.filter(p=>p.life>0);
-    for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.025*dt;p.life-=.013*dt;
-      ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();}
-    ctx.globalAlpha=1;frame=requestAnimationFrame(draw);
+  function shower(){
+    const w=canvas.clientWidth,h=canvas.clientHeight;
+    for(let i=0;i<65;i++){
+      const x=rand(w*.05,w*.95),y=rand(-h*.20,h*.05);
+      particles.push({x,y,px:x,py:y,vx:rand(-.7,.7),vy:rand(1.1,3.4),
+        life:rand(.7,1.5),decay:rand(.005,.010),r:rand(.7,2),
+        col:gold[i%gold.length],spark:true});
+    }
   }
-  frame=requestAnimationFrame(draw);
+  const sequence=[
+    [.18,.26,94,4.1],[.82,.22,94,4.1],[.50,.18,125,4.5],
+    [.20,.55,96,4.3],[.80,.48,96,4.3],[.45,.65,120,4.7],
+    [.72,.31,100,4.2],[.27,.28,110,4.5],[.52,.37,145,4.9],
+    [.12,.44,90,4],[.90,.52,90,4],[.49,.20,145,4.9]
+  ];
+  function cleanup(){
+    if(ended)return;ended=true;
+    cancelAnimationFrame(raf);window.removeEventListener('resize',fit);
+    ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
+    if(window.__ddayFireworksCleanup===cleanup)window.__ddayFireworksCleanup=null;
+  }
+  window.__ddayFireworksCleanup=cleanup;
+  function draw(t){
+    if(!start){start=t;burstAt=t;shower();}
+    const elapsed=t-start,dt=Math.min((t-(last||t))/16.67,2);last=t;
+    const w=canvas.clientWidth,h=canvas.clientHeight;
+    ctx.clearRect(0,0,w,h);
+    if(modalEl.hidden || elapsed>7000){cleanup();return;}
+    ctx.globalCompositeOperation='lighter';
+    if(t>=burstAt && bursts<sequence.length){
+      const [xr,yr,n,f]=sequence[bursts++];launch(w*xr,h*yr,n,f);
+      burstAt=t+(bursts%3===0?360:250);
+      if(bursts===6)shower();
+    }
+    rings=rings.filter(q=>q.alpha>0);
+    for(const q of rings){
+      q.r+=5*dt;q.alpha-=.045*dt;
+      ctx.beginPath();ctx.arc(q.x,q.y,q.r,0,Math.PI*2);
+      ctx.strokeStyle=q.col;ctx.lineWidth=2;ctx.globalAlpha=Math.max(0,q.alpha*.45);ctx.stroke();
+    }
+    particles=particles.filter(q=>q.life>0);
+    for(const q of particles){
+      q.px=q.x;q.py=q.y;q.x+=q.vx*dt;q.y+=q.vy*dt;
+      q.vx*=Math.pow(.992,dt);q.vy+=.035*dt;q.life-=q.decay*dt;
+      const alpha=Math.min(1,Math.max(0,q.life));ctx.globalAlpha=alpha;
+      ctx.strokeStyle=q.col;ctx.lineWidth=q.r*.8;ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(q.px,q.py);ctx.lineTo(q.x-q.vx*1.8,q.y-q.vy*1.8);ctx.stroke();
+      ctx.fillStyle=q.col;ctx.beginPath();ctx.arc(q.x,q.y,q.r,0,Math.PI*2);ctx.fill();
+      if(q.spark&&Math.random()<.16){ctx.globalAlpha=alpha*.6;ctx.fillRect(q.x+rand(-6,6),q.y+rand(-6,6),1.5,1.5);}
+    }
+    ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+    raf=requestAnimationFrame(draw);
+  }
+  raf=requestAnimationFrame(draw);
 }
 
 // Calendar
