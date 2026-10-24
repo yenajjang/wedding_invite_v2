@@ -69,8 +69,44 @@ window.addEventListener('scroll',()=>{if(window.scrollY>4)startMusicOnScroll();}
 // D-day
 const today=new Date(); today.setHours(0,0,0,0);const diff=Math.ceil((weddingDate.getTime()-today.getTime())/86400000);
 $('#dDayNumber').textContent=diff>0?`D-${diff}`:diff===0?'D-DAY':`D+${Math.abs(diff)}`;
-$('#dDayText').textContent=diff>0?`수한 ♥ 서령의 결혼식이 ${diff}일 남았습니다.`:diff===0?'오늘은 수한 ♥ 서령의 결혼식입니다.':'수한 ♥ 서령의 결혼식에 감사드립니다.';
-setTimeout(()=>modal('dDayModal',true),450);
+$('#dDayText').textContent=diff>0?`수한 ♥ 서령의 결혼식이 ${diff}일 남았습니다.`:diff===0?'오늘은 수한 ♥ 서령의 결혼식입니다.':'수한 ♥ 서령의 결혼식에 참석해주셔서 감사합니다.';
+setTimeout(()=>{modal('dDayModal',true);startDdayFireworks();},450);
+
+// Lightweight D-DAY-only firework animation; no external libraries.
+function startDdayFireworks(){
+  const canvas=$('#ddayFireworks');
+  if(!canvas || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const ctx=canvas.getContext('2d');
+  if(!ctx)return;
+  const modalEl=$('#dDayModal');
+  let particles=[], previous=0, start=0, frame=0, nextBurst=0;
+  const colors=['#f6d68c','#f4ead4','#e0c285','#c9d1d7','#ffffff'];
+  function fit(){const dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(canvas.clientWidth*dpr);canvas.height=Math.round(canvas.clientHeight*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);}
+  fit();
+  const onResize=()=>fit();window.addEventListener('resize',onResize);
+  function burst(){
+    const w=canvas.clientWidth,h=canvas.clientHeight;
+    const x=w*(.12+Math.random()*.76),y=h*(.16+Math.random()*.45);
+    for(let i=0;i<38;i++){
+      const a=2*Math.PI*i/38+(Math.random()-.5)*.13,v=1.6+Math.random()*2.3;
+      particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,r:.8+Math.random()*1.8,color:colors[Math.floor(Math.random()*colors.length)]});
+    }
+  }
+  function cleanup(){cancelAnimationFrame(frame);window.removeEventListener('resize',onResize);ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);}
+  function draw(t){
+    if(!start)start=t;
+    const dt=Math.min((t-(previous||t))/16.67,2);previous=t;
+    ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
+    if(modalEl.hidden || t-start>4800){cleanup();return;}
+    if(t>=nextBurst && t-start<3300){burst();nextBurst=t+360+Math.random()*340;}
+    particles=particles.filter(p=>p.life>0);
+    for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.025*dt;p.life-=.013*dt;
+      ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();}
+    ctx.globalAlpha=1;frame=requestAnimationFrame(draw);
+  }
+  frame=requestAnimationFrame(draw);
+}
+
 // Calendar
 const dayLabels=['S','M','T','W','T','F','S'];const grid=$('#calendarGrid');dayLabels.forEach((day,index)=>{const d=document.createElement('div');d.className='day-label'+(index===0?' sunday':'');d.textContent=day;grid.append(d);});
 const firstDay=new Date(2026,11,1).getDay();for(let i=0;i<firstDay;i++){const blank=document.createElement('div');grid.append(blank);}
