@@ -493,3 +493,59 @@
 .cover-photo {
   margin-top: 0 !important;
 }
+
+
+/* Reference-inspired cover flow: content / image / intentional lower padding.
+   Preserve full-width photo without scroll-driven resizing. */
+.cover {
+  height: auto !important;
+  min-height: 0 !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0;
+  padding: 0 0 80px;
+  background: #FF650B;
+  overflow: visible;
+}
+.cover-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0 0 20px; /* explicit church-text / photo gap */
+  background: #FF650B;
+  flex: 0 0 auto;
+}
+.cover .cover-top,
+.cover .cover-meta.intro-meta {
+  position: static !important;
+  top: auto !important;
+  transform: none;
+  flex: 0 0 auto;
+}
+/* Move the copy upward through real layout spacing rather than relative offsets. */
+.cover .cover-top { padding-top: 32px; }
+.cover .cover-meta.intro-meta { padding-bottom: 0; }
+.cover .cover-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  flex: 0 0 auto;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+.cover .cover-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  transform: none;
+  clip-path: none;
+}
+@media (min-width: 600px) {
+  .cover .cover-top { padding-top: 14px; }
+}
+@media (max-width: 599px) and (max-height: 700px) {
+  .cover .cover-top { padding-top: 18px; }
+}
