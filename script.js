@@ -162,34 +162,94 @@ function startDdayFireworks(){
 const dayLabels=['S','M','T','W','T','F','S'];const grid=$('#calendarGrid');dayLabels.forEach((day,index)=>{const d=document.createElement('div');d.className='day-label'+(index===0?' sunday':'');d.textContent=day;grid.append(d);});
 const firstDay=new Date(2026,11,1).getDay();for(let i=0;i<firstDay;i++){const blank=document.createElement('div');grid.append(blank);}
 for(let d=1;d<=31;d++){const el=document.createElement('div');const weekday=new Date(2026,11,d).getDay();el.className='calendar-day'+(weekday===0?' sunday':'')+(d===25?' holiday':'')+(d===19?' selected':'');el.textContent=d;grid.append(el);}
-// Gallery. Unavailable photo files display a neutral placeholder.
-const count=Math.max(9,Math.min(150,Number(cfg.galleryCount)||9));const photos=Array.from({length:count},(_,i)=>`./assets/gallery-${String(i+1).padStart(2,'0')}.jpg`);let activePhoto=0;
-function showPhoto(index){activePhoto=(index+count)%count;$('#lightboxImage').src=photos[activePhoto];$('#photoCounter').textContent=`${activePhoto+1} / ${count}`;}
-for(let i=0;i<Math.min(9,count);i++){const btn=document.createElement('button');btn.className='gallery-item';btn.setAttribute('aria-label',`${i+1}번째 웨딩 사진 확대`);const img=document.createElement('img');img.src=photos[i];img.alt=`웨딩 갤러리 ${i+1}`;img.loading='lazy';img.addEventListener('error',()=>{img.style.display='none';});const missing=document.createElement('span');missing.className='missing';missing.textContent=String(i+1).padStart(2,'0');btn.append(img,missing);if(i===8){const more=document.createElement('span');more.className='more-overlay';more.innerHTML=`${count>9?'+'+(count-9):''}<small>MORE</small>`;btn.append(more);}btn.addEventListener('click',()=>modal('galleryAlbum',true));$('#galleryGrid').append(btn);}
-// Full-screen 3x3 album. Selecting an image opens the existing single-photo viewer.
-for(let i=0;i<count;i++){
-  const button=document.createElement('button');
-  button.type='button';
-  button.className='album-item';
-  button.setAttribute('aria-label',`${i+1}번째 사진 보기`);
-  const image=document.createElement('img');
-  image.src=photos[i];
-  image.alt=`웨딩 사진 ${i+1}`;
-  image.loading='lazy';
-  button.append(image);
-  button.addEventListener('click',()=>{
-    showPhoto(i);
-    modal('galleryAlbum',false);
-    modal('lightbox',true);
-  });
-  $('#albumGrid').append(button);
+// Gallery: explicit file list; no network probes or directory auto-discovery.
+// Render one time and reuse the same DOM on every popup open/close.
+const galleryFiles = Array.isArray(cfg.galleryImages) ? cfg.galleryImages.filter(name =>
+  typeof name === 'string' && /^gallery-[a-zA-Z0-9_-]+\.(?:jpg|jpeg|webp|png)$/i.test(name)
+) : [];
+const photos = galleryFiles.map(name => `./assets/${name}`);
+// Use optimized WebP thumbnails for both the preview grid and the popup album.
+// Expanded photo view always uses photos[] (original files).
+const thumbnails = galleryFiles.map(name =>
+  `./assets/thumbs/${name.replace(/\.(?:jpg|jpeg|png|webp)$/i, '.webp')}`
+);
+const count = photos.length;
+let activePhoto = 0;
+function showPhoto(index) {
+  if (!count) return;
+  activePhoto = (index + count) % count;
+  $('#lightboxImage').src = photos[activePhoto];
+  $('#photoCounter').textContent = `${activePhoto + 1} / ${count}`;
 }
+function makeGalleryImage(index, album = false) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = album ? 'album-item' : 'gallery-item';
+  button.setAttribute('aria-label', `${index+1}번째 웨딩 사진 ${album ? '보기' : '사진첩 열기'}`);
+  const img = document.createElement('img');
+  img.src = thumbnails[index];
+  img.alt = `웨딩 갤러리 ${index+1}`;
+  // First nine WebP thumbnails are needed immediately in the album, even while its dialog is hidden.
+  // Remaining photos only load as they approach the viewport.
+  img.loading = index < 9 ? 'eager' : 'lazy';
+  img.decoding = 'async';
+  if (!album && index < 3) img.fetchPriority = 'low';
+  img.addEventListener('error', () => {
+    if (img.dataset.originalFallback !== '1' && img.src !== new URL(photos[index], document.baseURI).href) {
+      img.dataset.originalFallback = '1';
+      img.src = photos[index];
+    } else img.style.visibility = 'hidden';
+  });
+  button.append(img);
+  if (!album && index === 8) {
+    const more = document.createElement('span');
+    more.className = 'more-overlay';
+    more.innerHTML = `${count > 9 ? '+'+(count-9) : ''}<small>MORE</small>`;
+    button.append(more);
+  }
+  button.addEventListener('click', () => {
+    if (!album) return modal('galleryAlbum', true);
+    showPhoto(index);
+    modal('galleryAlbum', false);
+    modal('lightbox', true);
+  });
+  return button;
+}
+const previewFragment = document.createDocumentFragment();
+for(let i=0;i<Math.min(9,count);i++) previewFragment.append(makeGalleryImage(i));
+$('#galleryGrid').append(previewFragment);
+const albumFragment = document.createDocumentFragment();
+for(let i=0;i<count;i++) albumFragment.append(makeGalleryImage(i,true));
+$('#albumGrid').append(albumFragment);
+// The album DOM is built once at startup. Warm only its first nine lightweight
+// WebP thumbnails after the initial page render; never wait for them to open.
+function warmGalleryFirstPage() {
+  for (let i = 0; i < Math.min(9, count); i++) {
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = thumbnails[i];
+  }
+}
+if (document.readyState === 'complete') {
+  setTimeout(warmGalleryFirstPage, 0);
+} else {
+  window.addEventListener('load', () => setTimeout(warmGalleryFirstPage, 0), { once: true });
+}
+
+// Close the album directly, independent of overlay event propagation.
+const albumClose = document.querySelector('#galleryAlbum .album-close');
+if (albumClose) albumClose.addEventListener('click', event => {
+  event.preventDefault();
+  event.stopPropagation();
+  modal('galleryAlbum', false);
+});
 $('#closeGalleryPhoto').addEventListener('click',()=>{
   modal('lightbox',false);
   modal('galleryAlbum',true);
 });
-$('#prevPhoto').addEventListener('click',()=>showPhoto(activePhoto-1));$('#nextPhoto').addEventListener('click',()=>showPhoto(activePhoto+1));
-$('#lightboxImage').addEventListener('error',()=>notify('사진 파일을 assets 폴더에 추가해주세요.'));
+$('#prevPhoto').addEventListener('click',()=>showPhoto(activePhoto-1));
+$('#nextPhoto').addEventListener('click',()=>showPhoto(activePhoto+1));
+$('#lightboxImage').addEventListener('error',()=>notify('사진 파일을 assets 폴더에서 확인해주세요.'));
 // Accounts
 $$('.accordion-title').forEach(title=>title.addEventListener('click',()=>{const next=title.getAttribute('aria-expanded')!=='true';title.setAttribute('aria-expanded',String(next));title.querySelector('span').textContent=next?'⌃':'⌄';}));
 $$('[data-copy]').forEach(btn=>btn.addEventListener('click',async()=>{await copy(btn.dataset.copy);}));
