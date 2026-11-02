@@ -795,3 +795,12 @@
 /* Gallery performance: avoid painting offscreen rows until scrolled into view. */
 #galleryAlbum .album-item { content-visibility: auto; contain-intrinsic-size: auto 120px; }
 #galleryAlbum .album-sheet { will-change: auto; }
+
+/* Gallery popup responsiveness: show/hide directly, without entrance/exit motion.
+   Keep scrolling limited to the sheet and leave visual layout unchanged. */
+#galleryAlbum, #galleryAlbum .album-sheet, #galleryAlbum .album-header {
+  animation: none !important;
+  transition: none !important;
+}
+#galleryAlbum .album-grid { contain: layout style; }
+#galleryAlbum .album-item img { content-visibility: auto; }

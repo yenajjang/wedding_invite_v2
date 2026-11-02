@@ -70,10 +70,10 @@ window.addEventListener('scroll',()=>{if(window.scrollY>4)startMusicOnScroll();}
 const today=new Date(); today.setHours(0,0,0,0);const diff=Math.ceil((weddingDate.getTime()-today.getTime())/86400000);
 $('#dDayNumber').textContent=diff>0?`D-${diff}`:diff===0?'D-DAY':`D+${Math.abs(diff)}`;
 $('#dDayText').textContent=diff>0?`수한 ♥ 서령의 결혼식이 ${diff}일 남았습니다.`:diff===0?'오늘은 수한 ♥ 서령의 결혼식입니다.':'수한 ♥ 서령의 결혼식에 참석해주셔서 감사합니다.';
-setTimeout(()=>{modal('dDayModal',true);if(diff===0)startDdayFireworks();},450);
+setTimeout(()=>{modal('dDayModal',true);if(diff>=0)startDdayFireworks(diff>30?'early':diff>0?'near':'wedding');},450);
 
-// Lightweight D-DAY-only firework animation; no external libraries.
-function startDdayFireworks(){
+// Date-dependent firework animation: early 2 gold, near 4 gold/white, wedding day original 12.
+function startDdayFireworks(mode='wedding'){
   const canvas=$('#ddayFireworks');
   if(!canvas || window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   const ctx=canvas.getContext('2d');if(!ctx)return;
@@ -81,7 +81,9 @@ function startDdayFireworks(){
   if(window.__ddayFireworksCleanup)window.__ddayFireworksCleanup();
   let particles=[],rings=[],start=0,last=0,raf=0,burstAt=0,bursts=0,ended=false;
   const gold=['#ffe5a3','#ffd064','#ffae36','#fff7e5','#eacb8a','#ffeefa'];
-  const palette=['#fff0aa','#ffd068','#ffffff','#ffa88e','#d0d9ff','#ffb9dc'];
+  const palette=mode==='early'?['#ffe5a3','#ffd064','#ffae36','#fff7e5']:
+    mode==='near'?['#ffe5a3','#ffd064','#fff7e5','#ffffff']:
+    ['#fff0aa','#ffd068','#ffffff','#ffa88e','#d0d9ff','#ffb9dc'];
   const rand=(a,b)=>a+Math.random()*(b-a);
   function fit(){
     const dpr=Math.min(window.devicePixelRatio||1,2);
@@ -90,33 +92,61 @@ function startDdayFireworks(){
     ctx.setTransform(dpr,0,0,dpr,0,0);
   }
   fit();window.addEventListener('resize',fit);
-  function launch(x,y,n,force){
-    const col=palette[Math.floor(Math.random()*palette.length)];
+  function launch(x,y,n,force,chosenColor){
+    const col=chosenColor||palette[Math.floor(Math.random()*palette.length)];
     rings.push({x,y,r:4,alpha:.85,col});
     for(let i=0;i<n;i++){
       const a=2*Math.PI*(i/n)+rand(-.045,.045);
       const v=rand(force*.55,force*1.3);
       particles.push({x,y,px:x,py:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,
         life:rand(.7,1.15),decay:rand(.010,.020),r:rand(.9,2.5),
-        col:Math.random()<.65?gold[Math.floor(Math.random()*gold.length)]:col,
+        col:mode==='wedding' && Math.random()<.65?gold[Math.floor(Math.random()*gold.length)]:col,
         spark:Math.random()<.48});
     }
   }
+  // Convert card-relative coordinates into the full-screen canvas coordinate system.
+  // Burst centers stay near the card even on tall/narrow mobile screens.
+  function cardBounds(){
+    const card=modalEl.querySelector('.wedding-dday-card');
+    const a=card.getBoundingClientRect();
+    const b=canvas.getBoundingClientRect();
+    return {left:a.left-b.left,top:a.top-b.top,width:a.width,height:a.height};
+  }
+  function cardBurstPoint(xr,yr){
+    const b=cardBounds();
+    // Offset outer bursts slightly outside the opaque card so they remain visible
+    // behind it while their particles spread across the surrounding overlay.
+    const x = xr < .40 ? b.left - b.width*.09
+      : xr > .60 ? b.left + b.width*1.09
+      : b.left + b.width*xr;
+    const y = xr >= .40 && xr <= .60
+      ? b.top - b.height*.12
+      : b.top + b.height*yr;
+    return {x,y};
+  }
   function shower(){
-    const w=canvas.clientWidth,h=canvas.clientHeight;
+    const b=cardBounds();
     for(let i=0;i<65;i++){
-      const x=rand(w*.05,w*.95),y=rand(-h*.20,h*.05);
+      const x=rand(b.left-b.width*.18,b.left+b.width*1.18);
+      const y=rand(b.top-b.height*.40,b.top-b.height*.10);
       particles.push({x,y,px:x,py:y,vx:rand(-.7,.7),vy:rand(1.1,3.4),
         life:rand(.7,1.5),decay:rand(.005,.010),r:rand(.7,2),
         col:gold[i%gold.length],spark:true});
     }
   }
-  const sequence=[
+  const weddingSequence=[
     [.18,.26,94,4.1],[.82,.22,94,4.1],[.50,.18,125,4.5],
     [.20,.55,96,4.3],[.80,.48,96,4.3],[.45,.65,120,4.7],
     [.72,.31,100,4.2],[.27,.28,110,4.5],[.52,.37,145,4.9],
     [.12,.44,90,4],[.90,.52,90,4],[.49,.20,145,4.9]
   ];
+  const sequence=mode==='early'
+    ? [[.22,.28,66,3.5,'#ffd064'],[.78,.25,66,3.5,'#ffe5a3']]
+    : mode==='near'
+      ? [[.22,.25,76,3.8,'#ffd064'],[.78,.25,76,3.8,'#ffffff'],
+         [.28,.53,76,3.8,'#ffe5a3'],[.73,.51,76,3.8,'#ffffff']]
+      : weddingSequence;
+  const maxDuration=mode==='wedding'?7000:mode==='near'?4000:3200;
   function cleanup(){
     if(ended)return;ended=true;
     cancelAnimationFrame(raf);window.removeEventListener('resize',fit);
@@ -125,16 +155,16 @@ function startDdayFireworks(){
   }
   window.__ddayFireworksCleanup=cleanup;
   function draw(t){
-    if(!start){start=t;burstAt=t;shower();}
+    if(!start){start=t;burstAt=t;if(mode==='wedding')shower();}
     const elapsed=t-start,dt=Math.min((t-(last||t))/16.67,2);last=t;
     const w=canvas.clientWidth,h=canvas.clientHeight;
     ctx.clearRect(0,0,w,h);
-    if(modalEl.hidden || elapsed>7000){cleanup();return;}
+    if(modalEl.hidden || elapsed>maxDuration){cleanup();return;}
     ctx.globalCompositeOperation='lighter';
     if(t>=burstAt && bursts<sequence.length){
-      const [xr,yr,n,f]=sequence[bursts++];launch(w*xr,h*yr,n,f);
-      burstAt=t+(bursts%3===0?360:250);
-      if(bursts===6)shower();
+      const [xr,yr,n,f,col]=sequence[bursts++];const point=cardBurstPoint(xr,yr);launch(point.x,point.y,n,f,col);
+      burstAt=t+(mode==='wedding'?(bursts%3===0?360:250):mode==='near'?480:680);
+      if(mode==='wedding' && bursts===6)shower();
     }
     rings=rings.filter(q=>q.alpha>0);
     for(const q of rings){
@@ -179,7 +209,6 @@ function showPhoto(index) {
   if (!count) return;
   activePhoto = (index + count) % count;
   $('#lightboxImage').src = photos[activePhoto];
-  $('#photoCounter').textContent = `${activePhoto + 1} / ${count}`;
 }
 function makeGalleryImage(index, album = false) {
   const button = document.createElement('button');
@@ -191,9 +220,10 @@ function makeGalleryImage(index, album = false) {
   img.alt = `웨딩 갤러리 ${index+1}`;
   // First nine WebP thumbnails are needed immediately in the album, even while its dialog is hidden.
   // Remaining photos only load as they approach the viewport.
+  // First screen uses already generated lightweight WebP files; the rest waits for scrolling.
   img.loading = index < 9 ? 'eager' : 'lazy';
   img.decoding = 'async';
-  if (!album && index < 3) img.fetchPriority = 'low';
+  if (album && index >= 9) img.fetchPriority = 'low';
   img.addEventListener('error', () => {
     if (img.dataset.originalFallback !== '1' && img.src !== new URL(photos[index], document.baseURI).href) {
       img.dataset.originalFallback = '1';
@@ -221,19 +251,24 @@ $('#galleryGrid').append(previewFragment);
 const albumFragment = document.createDocumentFragment();
 for(let i=0;i<count;i++) albumFragment.append(makeGalleryImage(i,true));
 $('#albumGrid').append(albumFragment);
-// The album DOM is built once at startup. Warm only its first nine lightweight
-// WebP thumbnails after the initial page render; never wait for them to open.
+// Prepare the first album screen without blocking opening the popup.
+// The thumbnails are shared with the nine preview images, so cached image bytes are reused.
+let firstPageWarmed = false;
 function warmGalleryFirstPage() {
+  if (firstPageWarmed) return;
+  firstPageWarmed = true;
   for (let i = 0; i < Math.min(9, count); i++) {
-    const img = new Image();
-    img.decoding = 'async';
-    img.src = thumbnails[i];
+    const image = new Image();
+    image.decoding = 'async';
+    image.src = thumbnails[i];
+    // Do not await image.decode(): the popup must respond immediately to a tap.
   }
 }
-if (document.readyState === 'complete') {
-  setTimeout(warmGalleryFirstPage, 0);
+// Start only after document parsing, avoiding a delay until all unrelated page assets load.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', warmGalleryFirstPage, { once: true });
 } else {
-  window.addEventListener('load', () => setTimeout(warmGalleryFirstPage, 0), { once: true });
+  warmGalleryFirstPage();
 }
 
 // Close the album directly, independent of overlay event propagation.
@@ -375,16 +410,29 @@ function renderLetters(){
 }
 async function confirmedGuestbookPost(payload){
  const requestId='req_'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random().toString(36).slice(2));
+ // The POST is opaque (no-cors). A separate status response is required to
+ // confirm that Sheets was actually updated; never report success on POST alone.
  await sendForm(cfg.guestbookScriptUrl,{...payload,requestId});
- for(let n=0;n<10;n++){
-  await new Promise(r=>setTimeout(r,n<3?500:1100));
+ // The POST has completed. Do not add the previous unconditional 500ms delay:
+ // Apps Script has usually finished writing by this time.
+ const retryDelays=[0,180,350,600,900,1100,1100,1100,1100,1100];
+ let lastNetworkError=null;
+ for(let n=0;n<retryDelays.length;n++){
+  if(retryDelays[n])await new Promise(r=>setTimeout(r,retryDelays[n]));
   try{
    const state=await guestbookJsonp({action:'status',requestId});
    if(state.status==='success')return state;
    if(state.status==='error')throw Error(state.error||'처리에 실패했습니다.');
-  }catch(err){if(n===9)throw err;if(err.message.includes('처리에 실패')||err.message.includes('비밀번호'))throw err;}
+   // pending: keep polling using the same requestId, never POST again.
+   lastNetworkError=null;
+  }catch(err){
+   if(err.message && !/조회에 실패|서버 응답 시간이 초과/.test(err.message))throw err;
+   lastNetworkError=err;
+  }
  }
- throw Error('처리 결과를 확인하지 못했습니다. 시트를 확인한 후 다시 시도해주세요.');
+ throw Error(lastNetworkError
+  ? '저장 결과 확인이 지연되고 있습니다. 시트를 확인한 후 다시 시도해주세요.'
+  : '처리 결과를 확인하지 못했습니다. 시트를 확인한 후 다시 시도해주세요.');
 }
 function openLetters(){hideGuestbookSuccess();letterPage=0;selectedLetterId=null;modal('lettersModal',true);refreshLetters();}
 $('#openLetters').addEventListener('click',openLetters);
