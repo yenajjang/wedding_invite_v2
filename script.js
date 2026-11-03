@@ -368,46 +368,101 @@ if(isConfigured(cfg.guestbookScriptUrl)){
  else window.addEventListener('load',()=>setTimeout(preload,100),{once:true});
 }
 
+// Position each message by its measured height; never allow two notes to overlap.
+// A page holds at most 5 notes; overflowing notes move intact to the next page.
+function makeLetterNode(item){
+ const div=document.createElement('div');div.className='letter-message';
+ const content=document.createElement('button');content.type='button';content.className='letter-message-content';
+ content.setAttribute('aria-label',item.name+'님의 방명록 선택');content.setAttribute('aria-pressed','false');
+ const msg=document.createElement('p');msg.textContent=item.message;
+ const name=document.createElement('small');name.textContent=item.name;
+ content.append(msg,name);
+ const remove=document.createElement('button');remove.type='button';remove.className='letter-trash';
+ remove.setAttribute('aria-label',item.name+'님의 방명록 삭제');remove.hidden=true;
+ remove.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 10v6M14 10v6"/></svg>';
+ content.addEventListener('click',()=>{
+  const next=selectedLetterId===item.id?null:item.id;
+  selectedLetterId=next;
+  document.querySelectorAll('#letterMessages .letter-message').forEach(el=>{
+   const active=el.dataset.id===String(next);
+   el.classList.toggle('is-selected',active);
+   el.querySelector('.letter-trash').hidden=!active;
+   el.querySelector('.letter-message-content').setAttribute('aria-pressed',String(active));
+  });
+ });
+ remove.addEventListener('click',event=>{
+  event.stopPropagation();deleteTarget=item.id;
+  $('#guestbookDeleteError').textContent='';$('#guestbookDeleteForm').reset();
+  updateGuestbookDeleteButton();modal('guestbookDeleteModal',true);
+  $('#guestbookDeleteForm').elements.password.focus();
+ });
+ div.dataset.id=String(item.id);div.append(content,remove);return div;
+}
 function renderLetters(){
- const perPage=5,total=Math.max(1,Math.ceil(letters.length/perPage));
+ const root=$('#letterMessages');
+ const paper=root.closest('.letter-paper');
+ const paperWidth=paper.clientWidth || 330, paperHeight=paper.clientHeight || paperWidth*4/3;
+ const startY=paperHeight*.235, endY=paperHeight*.915;
+ const gap=Math.max(12,paperHeight*.035);
+ const colWidth=paperWidth*.415;
+ const lefts=[paperWidth*.065,paperWidth*.52];
+ const maxHeight=Math.max(80,endY-startY);
+ // Build temporary nodes at their real CSS width to measure wrapped lines accurately.
+ const nodes=letters.map(makeLetterNode);
+ const measure=document.createElement('div');measure.className='letter-measure';
+ root.append(measure);
+ nodes.forEach(node=>{
+  node.style.width=colWidth+'px';
+  measure.append(node);
+ });
+ const sizes=nodes.map(node=>{
+  let height=node.getBoundingClientRect().height;
+  if(height>maxHeight){
+   // A single exceptionally long letter cannot fit whole on one sheet.
+   // Allow scrolling within that one note rather than clipping its content.
+   node.classList.add('is-long');
+   node.querySelector('.letter-message-content').style.maxHeight=Math.max(50,maxHeight-3)+'px';
+   height=node.getBoundingClientRect().height;
+  }
+  return Math.min(height,maxHeight);
+ });
+ const pages=[];let page=[],used=[startY,startY];
+ function finishPage(){if(page.length)pages.push(page);page=[];used=[startY,startY];}
+ nodes.forEach((node,i)=>{
+  const h=sizes[i];
+  // Prefer the column with more free space to preserve the scattered letter look.
+  let order=used[0]<=used[1]?[0,1]:[1,0];
+  let col=order.find(c=>used[c]+h<=endY+0.5);
+  if(page.length>=5 || col===undefined){finishPage();col=0;}
+  const y=used[col];
+  page.push({node,x:lefts[col],y});
+  used[col]=y+h+gap;
+ });
+ finishPage();
+ measure.remove();
+ const total=Math.max(1,pages.length);
  letterPage=Math.max(0,Math.min(letterPage,total-1));
  selectedLetterId=null;
- const positions=[[28,28],[72,38],[28,68],[68,82],[62,57]];
- const items=letters.slice(letterPage*perPage,(letterPage+1)*perPage);
- const nodes=items.map((item,i)=>{
-  const div=document.createElement('div');div.className='letter-message';
-  div.style.left=positions[i][0]+'%';div.style.top=positions[i][1]+'%';
-  const content=document.createElement('button');content.type='button';content.className='letter-message-content';
-  content.setAttribute('aria-label',item.name+'님의 방명록 선택');content.setAttribute('aria-pressed','false');
-  const msg=document.createElement('p');msg.textContent=item.message;
-  const name=document.createElement('small');name.textContent=item.name;
-  content.append(msg,name);
-  const remove=document.createElement('button');remove.type='button';remove.className='letter-trash';
-  remove.setAttribute('aria-label',item.name+'님의 방명록 삭제');remove.hidden=true;
-  remove.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 10v6M14 10v6"/></svg>';
-  content.addEventListener('click',()=>{
-    const next=selectedLetterId===item.id?null:item.id;
-    selectedLetterId=next;
-    document.querySelectorAll('#letterMessages .letter-message').forEach(el=>{
-      const active=el.dataset.id===String(next);
-      el.classList.toggle('is-selected',active);
-      el.querySelector('.letter-trash').hidden=!active;
-      el.querySelector('.letter-message-content').setAttribute('aria-pressed',String(active));
-    });
-  });
-  remove.addEventListener('click',event=>{
-    event.stopPropagation();deleteTarget=item.id;
-    $('#guestbookDeleteError').textContent='';$('#guestbookDeleteForm').reset();
-    updateGuestbookDeleteButton();modal('guestbookDeleteModal',true);
-    $('#guestbookDeleteForm').elements.password.focus();
-  });
-  div.dataset.id=String(item.id);div.append(content,remove);return div;
+ const selected=pages[letterPage]||[];
+ const visible=selected.map(({node,x,y})=>{
+  node.style.left=x+'px';node.style.top=y+'px';
+  return node;
  });
- if(!nodes.length){const empty=document.createElement('p');empty.className='letters-empty';empty.textContent='첫 번째 축하 메시지를 남겨주세요.';nodes.push(empty);}
- $('#letterMessages').replaceChildren(...nodes);
+ if(!visible.length){const empty=document.createElement('p');empty.className='letters-empty';empty.textContent='첫 번째 축하 메시지를 남겨주세요.';visible.push(empty);}
+ root.replaceChildren(...visible);
  $('#lettersPage').textContent=Array.from({length:total},(_,i)=>i===letterPage?'●':'○').join(' ');
  $('#lettersPrev').disabled=letterPage===0;$('#lettersNext').disabled=letterPage===total-1;
 }
+// Device rotation and responsive font changes can change the number of lines.
+let letterResizeTimer;
+window.addEventListener('resize',()=>{
+ if($('#lettersModal').hidden)return;
+ clearTimeout(letterResizeTimer);
+ letterResizeTimer=setTimeout(renderLetters,120);
+});
+if(document.fonts?.ready)document.fonts.ready.then(()=>{
+ if(!$('#lettersModal').hidden)renderLetters();
+});
 async function confirmedGuestbookPost(payload){
  const requestId='req_'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random().toString(36).slice(2));
  // The POST is opaque (no-cors). A separate status response is required to

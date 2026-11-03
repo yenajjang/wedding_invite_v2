@@ -845,3 +845,34 @@
   object-fit: contain;
   object-position: center center;
 }
+
+/* Guestbook auto pagination: height-based placement prevents message overlap. */
+#lettersModal .letter-paper .letter-message{
+  transform:none !important;
+  max-width:none;
+  box-sizing:border-box;
+}
+#lettersModal .letter-measure{
+  position:absolute;
+  inset:0;
+  visibility:hidden;
+  pointer-events:none;
+  z-index:-1;
+}
+#lettersModal .letter-measure .letter-message{
+  position:relative;
+  top:auto !important;
+  left:auto !important;
+}
+#lettersModal .letter-message.is-long .letter-message-content{
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+}
+#lettersModal .letter-pagination #lettersPage{
+  display:block;
+  max-width:205px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
