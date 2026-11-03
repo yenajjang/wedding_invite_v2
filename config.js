@@ -33,5 +33,8 @@ window.WEDDING_CONFIG = {
     'gallery-24.jpeg',
     'gallery-25.jpeg',
     'gallery-26.jpeg',
+    'gallery-27.jpeg',
+    'gallery-28.jpeg',
+    'gallery-29.jpeg',
   ],
 };
